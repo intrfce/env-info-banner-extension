@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Env Info Banner test page</title>
+<meta name="if-env-info" content='{"environment":"staging","colour":"#7d4a00","app":"Shop","worktree":"feature/checkout","extra":{"release":"2026.09.14-3","db":"app_staging","queue":"redis","php":"8.3.12","deployed":"2026-09-17 14:02 UTC"}}'>
+<style>
+  body { font: 15px/1.6 ui-sans-serif, system-ui, sans-serif; margin: 0; padding: 40px 24px; }
+  main { max-width: 60ch; margin: 0 auto; }
+  button { font: inherit; padding: 8px 14px; margin: 0 8px 8px 0; cursor: pointer; }
+  pre { background: #f2f3f5; padding: 12px; overflow-x: auto; }
+  .tall { height: 150vh; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Test page</h1>
+  <p>Open this with <code>file://</code> or serve it locally. The buttons rewrite the meta tag so you can watch the banner react without reloading.</p>
+  <p>
+    <button type="button" data-env="production" data-colour="#96150f">production</button>
+    <button type="button" data-env="staging" data-colour="#7d4a00">staging</button>
+    <button type="button" data-env="local" data-colour="#0f3f74">local</button>
+    <button type="button" data-env="review-app-42" data-colour="#15613a">review-app-42</button>
+    <button type="button" id="noenv">no environment key</button>
+    <button type="button" id="broken">broken JSON</button>
+    <button type="button" id="remove">remove the tag</button>
+  </p>
+  <p>
+    Extra block (open the popup to see it):
+    <button type="button" id="noextra">no extra key</button>
+    <button type="button" id="extraonly">extra only, no other fields</button>
+    <button type="button" id="extrabad">extra is a string, not an object</button>
+  </p>
+  <p>
+    Colours:
+    <button type="button" data-env="light" data-colour="#f5f5dc">a pale colour, dark text</button>
+    <button type="button" data-env="vivid" data-colour="#ffff00">bright yellow</button>
+    <button type="button" data-env="short" data-colour="#abc">#abc shorthand</button>
+    <button type="button" data-env="nohash" data-colour="96150f">no leading hash</button>
+  </p>
+  <p>
+    Rejected, all fall back to grey:
+    <button type="button" data-env="staging" data-colour="red">a colour name</button>
+    <button type="button" data-env="staging" data-colour="">no colour key at all</button>
+    <button type="button" data-env="staging" data-colour="#fff; background: url(http://evil)">CSS injection attempt</button>
+    <button type="button" id="american">"color" spelling works</button>
+  </p>
+  <pre id="current"></pre>
+  <div class="tall">Scroll space, to check the banner does not cover anything it shouldn't.</div>
+</main>
+<script>
+  const TAG = 'if-env-info';
+
+  const find = () => document.querySelector(`meta[name="${TAG}"]`);
+
+  const ensure = () => {
+    let tag = find();
+    if (!tag) {
+      tag = document.createElement('meta');
+      tag.setAttribute('name', TAG);
+      document.head.append(tag);
+    }
+    return tag;
+  };
+  const show = () => {
+    const main = find();
+    document.getElementById('current').textContent = main
+      ? main.getAttribute('content')
+      : '(no meta tag)';
+  };
+
+  const write = (extra) => {
+    const payload = {
+      environment: 'staging',
+      colour: 'amber',
+      app: 'Shop',
+      worktree: 'feature/checkout',
+      // Popup-only detail: never drawn on the bar, shown under "Extra" in the popup.
+      extra: {
+        release: '2026.09.14-3',
+        db: 'app_staging',
+        queue: 'redis',
+        php: '8.3.12',
+        deployed: '2026-09-17 14:02 UTC',
+      },
+      ...extra,
+    };
+    // An empty colour is the same as sending none at all.
+    if (!payload.colour) delete payload.colour;
+    ensure().setAttribute('content', JSON.stringify(payload));
+    show();
+  };
+  document.querySelectorAll('[data-env]').forEach((button) => {
+    button.addEventListener('click', () => write({
+      environment: button.dataset.env,
+      colour: button.dataset.colour,
+    }));
+  });
+  document.getElementById('american').addEventListener('click', () => {
+    ensure().setAttribute('content', JSON.stringify({
+      environment: 'staging', color: '#4d3382', app: 'Shop', worktree: 'feature/checkout',
+    }));
+    show();
+  });
+
+  const setTag = (payload) => { ensure().setAttribute('content', JSON.stringify(payload)); show(); };
+
+  document.getElementById('noextra').addEventListener('click', () => setTag({
+    environment: 'staging', colour: '#7d4a00', app: 'Shop', worktree: 'feature/checkout',
+  }));
+  document.getElementById('extraonly').addEventListener('click', () => setTag({
+    colour: '#15613a', extra: { release: '2026.09.14-3', db: 'app_staging' },
+  }));
+  document.getElementById('extrabad').addEventListener('click', () => setTag({
+    environment: 'staging', colour: '#7d4a00', app: 'Shop', extra: 'not an object',
+  }));
+
+  // No environment key: the bar should still lead with the icon and a dimmed "unknown".
+  document.getElementById('noenv').addEventListener('click', () => {
+    ensure().setAttribute('content', JSON.stringify({
+      colour: '#0f3f74', app: 'Shop', worktree: 'feature/checkout', release: '2026.09.14-3',
+    }));
+    show();
+  });
+
+  document.getElementById('broken').addEventListener('click', () => {
+    ensure().setAttribute('content', '{environment: staging}');
+    show();
+  });
+  document.getElementById('remove').addEventListener('click', () => {
+    const tag = find();
+    if (tag) tag.remove();
+    show();
+  });
+  show();
+</script>
+</body>
+</html>

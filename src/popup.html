@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Env Info Banner</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #ffffff; --ink: #1b1d1f; --soft: #5f6368; --line: #dcdfe3; --accent: #0f3f74;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #202325; --ink: #e8eaed; --soft: #9aa0a6; --line: #34383c; --accent: #7fb4ff; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    width: 288px; margin: 0; padding: 14px;
+    background: var(--bg); color: var(--ink);
+    font: 13px/1.45 ui-sans-serif, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  #state { margin: 0 0 12px; color: var(--soft); }
+  #state[hidden] { display: none; }
+  section { margin: 0 0 12px; }
+  h2 {
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
+    color: var(--soft); margin: 0 0 7px; padding-bottom: 5px;
+    border-bottom: 1px solid var(--line);
+  }
+  dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 5px 10px; }
+  dt { color: var(--soft); }
+  dd { margin: 0; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; overflow-wrap: anywhere; }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; border-top: 1px solid var(--line); padding-top: 12px; }
+  #action { flex: 1 0 100%; }
+  button {
+    flex: 1; font: inherit; font-weight: 600; padding: 7px 10px;
+    border: 1px solid var(--line); border-radius: 6px;
+    background: transparent; color: var(--ink); cursor: pointer;
+  }
+  button:hover { border-color: var(--accent); }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  code { font-family: ui-monospace, Menlo, monospace; }
+</style>
+</head>
+<body>
+  <p id="state">Checking this page…</p>
+
+  <section id="basic" hidden>
+    <h2>Basic</h2>
+    <dl id="basic-fields"></dl>
+  </section>
+
+  <section id="extra" hidden>
+    <h2>Extra</h2>
+    <dl id="extra-fields"></dl>
+  </section>
+
+  <div class="actions">
+    <button type="button" id="action" hidden></button>
+    <button type="button" id="toggle">Hide banner</button>
+    <button type="button" id="settings">Settings</button>
+  </div>
+<script src="shared.js"></script>
+<script src="popup.js"></script>
+</body>
+</html>
