@@ -31,8 +31,6 @@ The `content` attribute in the meta tag should be a JSON object of string or num
 | `extra` | A nested object. Never drawn on the bar — popup only. See below. |
 | anything else | Shown as a label/value pair, in the order the page sent it. |
 
-
-
 The `extra` key allows no more than 30 fields under `extra`, with 40 characters per key, 200 per value.
 
 Invalid JSON, or an object with nothing usable in it, shows no banner at all and logs the reason and the raw attribute
@@ -45,3 +43,8 @@ The page supplies one hex value and the extension works out the text colour to g
 ```html
 "colour": "#7d4a00"
 ```
+
+### Settings
+
+<img width="1564" height="1696" alt="CleanShot 2026-09-18 at 10 19 15@2x" src="https://github.com/user-attachments/assets/b5fb0e3d-6110-45f1-b45f-bfef8679a5b8" />
+
